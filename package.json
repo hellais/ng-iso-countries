@@ -1,7 +1,7 @@
 {
   "name": "ng-iso-countries",
   "description": "ISO Country and Currency Codes for Angular.js",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "Arturo <art@fuffa.org>",
   "private": false,
   "engines": {
