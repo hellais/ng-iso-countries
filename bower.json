@@ -1,0 +1,22 @@
+{
+  "name": "ng-iso-countries",
+  "main": "index.js",
+  "version": "0.0.1",
+  "homepage": "https://github.com/hellais/ng-iso-countries",
+  "authors": [
+    "Arturo Filastò <art@fuffa.org>"
+  ],
+  "description": "ISO Country and Currency Codes for Angular.js",
+  "keywords": [
+    "angular.js",
+    "countries"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
