@@ -7,7 +7,7 @@ module.exports = function(grunt) {
     uglify: {
       build: {
         files: {
-          'dist/countries.min.js': ['src/countries.js']
+          'dist/countries.min.js': ['dist/countries.js']
         }
       }
     },
@@ -17,7 +17,7 @@ module.exports = function(grunt) {
       },
       all: [
         'Gruntfile.js',
-        'src/{,*/}*.js'
+        'dist/countries.js'
       ]
     }
   });
@@ -73,8 +73,12 @@ module.exports = function(grunt) {
 
     });
 
+    function loadTemplate(callback) {
+      var template = grunt.file.read(__dirname + '/' + 'countries.js.template');
+      callback(null, template.toString());
+    }
+
     loadTemplate(function(err, template) {
-      console.log("Loading template...");
       if(err || !template) {
         console.log('Failed to load template'.red);
         console.log(err);
@@ -85,10 +89,6 @@ module.exports = function(grunt) {
       grunt.file.write(outputfile, template);
     });
 
-    function loadTemplate(callback) {
-      var template = grunt.file.read(__dirname + '/' + 'countries.js.template');
-      callback(null, template.toString());
-    }
 
   });
 
