@@ -1,3 +1,4 @@
+// XXX these tests are still of the original library, they should be adapted.
 var fs = require('fs'),
   should = require('should'),
   _ = require('underscore');

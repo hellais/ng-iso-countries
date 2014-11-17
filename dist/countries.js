@@ -1,25 +1,12 @@
-(function() {
+'use strict';
 
-  var iso = {};
+angular.module('ng-iso-countries', [])
+  .factory('countries', function() {
+  
+    var iso = {};
+    iso.version = '0.1';
 
-  // global on the server, window in the browser
-  var root = this,
-    previous_iso = root.iso;
-
-  if (typeof module !== 'undefined' && module.exports) {
-    module.exports = iso;
-  } else {
-    root.iso = iso;
-  }
-
-  iso.noConflict = function() {
-    root.iso = previous_iso;
-    return iso;
-  };
-
-  iso.version = '0.1';
-
-  iso.countries = {
+    iso.countries = {
   "AD": {
     "value": "AD",
     "name": "Andorra",
@@ -4934,7 +4921,7 @@
   }
 };
 
-  iso.currencies = {
+    iso.currencies = {
   "EUR": {
     "value": "EUR",
     "name": "EUR",
@@ -6106,78 +6093,105 @@
     ]
   }
 };
+  
+    iso.isCountryCode(code) {
+      return iso.countries.hasOwnProperty(prop);
+    };
 
-  iso.findCountryByCode = function(code) {
-    for (var prop in iso.countries) {
-      if (iso.countries.hasOwnProperty(prop)) {
-        if (iso.countries[prop].alpha2 == code || iso.countries[prop].alpha3 == code) return iso.countries[prop];
-      }
-    }
-  };
-
-  iso.findCountryByNumber = function(num) {
-    num = parseInt(num, 10);
-    for (var prop in iso.countries) {
-      if (iso.countries.hasOwnProperty(prop)) {
-        if (parseInt(iso.countries[prop].number, 10) == num) return iso.countries[prop];
-      }
-    }
-  };
-
-  iso.findCountryByName = function(name) {
-    for (var prop in iso.countries) {
-      if (iso.countries.hasOwnProperty(prop)) {
-        if (iso.countries[prop]['name'] == name) return iso.countries[prop];
-        else if (iso.countries[prop]['names'] && iso.countries[prop]['names'].indexOf(name) > -1) return iso.countries[prop];
-      }
-    }
-  };
-
-  iso.findCountriesByRegion = function(region) {
-    var results = [];
-
-    for (var prop in iso.countries) {
-      if (iso.countries.hasOwnProperty(prop)) {
-        if (iso.countries[prop]['region'] == region) {
-          results.push(iso.countries[prop]);
+    iso.findCountryByCode = function(code) {
+      for (var prop in iso.countries) {
+        if (iso.countries.hasOwnProperty(prop)) {
+          if (iso.countries[prop].alpha2 == code || iso.countries[prop].alpha3 == code) return iso.countries[prop];
         }
       }
-    }
-    if (!results.length) return undefined;
-    return results;
-  };
+    };
 
-  iso.getSimpleCountryList = function() {
-    var results = [];
+    iso.findCountryByNumber = function(num) {
+      num = parseInt(num, 10);
+      for (var prop in iso.countries) {
+        if (iso.countries.hasOwnProperty(prop)) {
+          if (parseInt(iso.countries[prop].number, 10) == num) return iso.countries[prop];
+        }
+      }
+    };
 
-    for(var prop in iso.countries) {
-      results.push({
-        value: iso.countries[prop].value,
-        name: iso.countries[prop].name
+    iso.findCountryByName = function(name) {
+      for (var prop in iso.countries) {
+        if (iso.countries.hasOwnProperty(prop)) {
+          if (iso.countries[prop]['name'] == name) return iso.countries[prop];
+          else if (iso.countries[prop]['names'] && iso.countries[prop]['names'].indexOf(name) > -1) return iso.countries[prop];
+        }
+      }
+    };
+
+    iso.findCountriesByRegion = function(region) {
+      var results = [];
+
+      for (var prop in iso.countries) {
+        if (iso.countries.hasOwnProperty(prop)) {
+          if (iso.countries[prop]['region'] == region) {
+            results.push(iso.countries[prop]);
+          }
+        }
+      }
+      if (!results.length) return undefined;
+      return results;
+    };
+
+    iso.getSimpleCountryList = function() {
+      var results = [];
+
+      for(var prop in iso.countries) {
+        results.push({
+          value: iso.countries[prop].value,
+          name: iso.countries[prop].name
+        });
+      }
+
+      return results.sort(function(a,b) {
+        if (a.name < b.name)  return -1;
+        if (a.name > b.name)  return 1;
+        return 0;
+      });
+    };
+
+    iso.getAllISOCodes = function() {
+      return Object.keys(iso.countries).sort(function (a,b) {
+        if (a < b) return -1;
+        if (a > b) return 1;
+        return 0;
       });
     }
 
-    return results.sort(function(a,b) {
-      if (a.name < b.name)  return -1;
-      if (a.name > b.name)  return 1;
-      return 0;
-    });
-  };
-
-  iso.getAllISOCodes = function() {
-    return Object.keys(iso.countries).sort(function (a,b) {
-      if (a < b) return -1;
-      if (a > b) return 1;
-      return 0;
-    });
-  }
-
-  iso.findCurrency = function(currency) {
-    for (var prop in iso.currencies) {
-      if (iso.currencies.hasOwnProperty(prop)) {
-        if (iso.currencies[prop]['value'] == currency) return iso.currencies[prop];
+    iso.findCurrency = function(currency) {
+      for (var prop in iso.currencies) {
+        if (iso.currencies.hasOwnProperty(prop)) {
+          if (iso.currencies[prop]['value'] == currency) return iso.currencies[prop];
+        }
       }
-    }
-  };
+    };
 
-}());
+    return iso;
+  })
+  .filter('isoCountry', ['countries']{
+    var result = countries.findCountryByCode(input);
+    return angular.isUndefined(result) ? input : result;
+  })
+  .directive('countryCode', ['countries', function(countries) {
+    return {
+      require: 'ngModel',
+      link: function(scope, elm, attrs, ctrl) {
+        ctrl.$parsers.unshift(function(viewValue) {
+          if(countries.isCountryCode(viewValue)) {
+            ctrl.$setValidity('countrycode', true);
+            return viewValue;
+          } else {
+            ctrl.$setValidity('countrycode', false);
+            return undefined;
+          }
+        });
+      }
+    };
+  });
+});
+
